@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/tomasulo_algorithm_simulation/static/css/main.b32b7a6a.chunk.css",
+    "main.js": "/tomasulo_algorithm_simulation/static/js/main.dfe5de6e.chunk.js",
+    "main.js.map": "/tomasulo_algorithm_simulation/static/js/main.dfe5de6e.chunk.js.map",
+    "runtime-main.js": "/tomasulo_algorithm_simulation/static/js/runtime-main.ec0a91c2.js",
+    "runtime-main.js.map": "/tomasulo_algorithm_simulation/static/js/runtime-main.ec0a91c2.js.map",
+    "static/js/2.bacc9f68.chunk.js": "/tomasulo_algorithm_simulation/static/js/2.bacc9f68.chunk.js",
+    "static/js/2.bacc9f68.chunk.js.map": "/tomasulo_algorithm_simulation/static/js/2.bacc9f68.chunk.js.map",
+    "static/js/3.fe737660.chunk.js": "/tomasulo_algorithm_simulation/static/js/3.fe737660.chunk.js",
+    "static/js/3.fe737660.chunk.js.map": "/tomasulo_algorithm_simulation/static/js/3.fe737660.chunk.js.map",
+    "index.html": "/tomasulo_algorithm_simulation/index.html",
+    "static/css/main.b32b7a6a.chunk.css.map": "/tomasulo_algorithm_simulation/static/css/main.b32b7a6a.chunk.css.map",
+    "static/js/2.bacc9f68.chunk.js.LICENSE.txt": "/tomasulo_algorithm_simulation/static/js/2.bacc9f68.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ec0a91c2.js",
+    "static/js/2.bacc9f68.chunk.js",
+    "static/css/main.b32b7a6a.chunk.css",
+    "static/js/main.dfe5de6e.chunk.js"
+  ]
+}
