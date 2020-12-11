@@ -73,6 +73,8 @@ class App extends Component {
     var res = assmebly.split(";");
     const variable = [...this.state.insrtuctions]
     const datamem = [...this.state.data]
+    const RS = [...this.state.ReservationStations]
+    const Regs = [...this.state.Regs]
     for (var i = 0; i < res.length - 1; i++) {
       if (res[i].search("lw") > -1)
         variable[i] = { pc: i, instruction: res[i], Issued: " ", issueClk: -1, ex: " ", ExClk: -1, count: 2, Wb: " ", WbClk: -1, done: -1 }
@@ -100,6 +102,24 @@ class App extends Component {
     for (var j = 0; j < 65536; j++) {
       datamem[j] = { value: 0 };
     }
+    RS[0] = { name: "LW1", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[1] = { name: "LW2", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[2] = { name: "SW1", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[3] = { name: "SW2", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[4] = { name: "BEQ", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[5] = { name: "JALR/RET", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[6] = { name: "ADD/NEG/ADDI_1", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[7] = { name: "ADD/NEG/ADDI_2", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", A: "", instruction: "" };
+    RS[8] = { name: "DIV", busy: "N", op: "", vj: "", vk: "", Qj: "", Qk: "", instruction: "" };
+
+    Regs[0] = { reg: "x0", Qi: "", used: 0, value: 0 };
+    Regs[1] = { reg: "x1", Qi: "", used: 0, value: 1 };
+    Regs[2] = { reg: "x2", Qi: "", used: 0, value: 1 };
+    Regs[3] = { reg: "x3", Qi: "", used: 0, value: 6 };
+    Regs[4] = { reg: "x4", Qi: "", used: 0, value: 1 };
+    Regs[5] = { reg: "x5", Qi: "", used: 0, value: 1 };
+    Regs[6] = { reg: "x6", Qi: "", used: 0, value: 1 };
+    Regs[7] = { reg: "x7", Qi: "", used: 0, value: 1 };
 
     this.setState(this.state.insrtuctions = variable)
     console.log(this.state.insrtuctions);
@@ -108,6 +128,8 @@ class App extends Component {
     this.setState({ jumbbeq: -1 })
     this.setState({ beqstart: -1 })
     this.setState(this.state.data = datamem)
+    this.setState(this.state.Regs = Regs)
+    this.setState(this.state.ReservationStations = RS)
     console.log(this.state.data);
     this.setState({ clkflag: 0 })
     this.setState({ maxPC: 0 });
@@ -1101,7 +1123,7 @@ ret;
 addi x6,x7,10;
 addi x1,x1,1;
 beq x1,x3,1;
-beq x0,x2,-1;
+beq x4,x2,-1;
 addi x6,x7,10;
  */
   render() {
