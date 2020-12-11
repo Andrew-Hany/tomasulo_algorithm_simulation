@@ -25,7 +25,7 @@ class App extends Component {
     data: [],
 
     Regs: [
-      { reg: "x0", Qi: "", used: 0, value: 1 },
+      { reg: "x0", Qi: "", used: 0, value: 0 },
       { reg: "x1", Qi: "", used: 0, value: 1 },
       { reg: "x2", Qi: "", used: 0, value: 1 },
       { reg: "x3", Qi: "", used: 0, value: 6 },
@@ -58,6 +58,10 @@ class App extends Component {
 
     //indication to end the clk 
     clkflag: 0,
+    lastinstructionPC: 0,
+    maxPC: 0,
+
+    jalrMax: 0,
   };
   assemblyText = (e) => {
     this.setState({ assembly: e })
@@ -92,6 +96,7 @@ class App extends Component {
       else
         variable[i] = { pc: i, instruction: res[i], Issued: " ", issueClk: -1, ex: " ", ExClk: -1, count: 10000, Wb: " ", WbClk: -1, }
     }
+    this.setState({ lastinstructionPC: variable.length - 1 })
     for (var j = 0; j < 65536; j++) {
       datamem[j] = { value: 0 };
     }
@@ -105,6 +110,12 @@ class App extends Component {
     this.setState(this.state.data = datamem)
     console.log(this.state.data);
     this.setState({ clkflag: 0 })
+    this.setState({ maxPC: 0 });
+    this.setState({ TotalInstructin: 0 });
+    this.setState({ IPC: 0 });
+    this.setState({ missPer: 0 });
+    this.setState({ missNom: 0 });
+    this.setState({ branchcount: 0 });
   }
 
   handleglobalPc = () => {
@@ -117,7 +128,11 @@ class App extends Component {
     const regs = [...this.state.Regs];
     const datamem = [...this.state.data]
     var operands = [];
+
     var PC = this.state.globalPc;
+
+
+
     //pc 
     var RS1;
     var RS2 = "";
@@ -214,6 +229,7 @@ sw x1,10(x2);
 
       console.log("this.state.beqstart   " + this.state.beqstart);
       for (var j = 0; j < 9; j++) {
+
         // console.log(RS.length)
         // console.log(this.state.ReservationStations[j].name.search("LW") + this.state.insrtuctions[i].instruction.search("lw") + this.state.ReservationStations[j].busy);
         //---------------------------------------------issued----------------------------------------------------------------------------------//
@@ -461,30 +477,32 @@ sw x1,10(x2);
           //add
           if (this.state.insrtuctions[i].instruction.search("addi") > -1) {
 
-            regs[tempRD].value = parseInt(regs[tempRs1].value) + parseInt(imm);
+            if (tempRD != 0)
+              regs[tempRD].value = parseInt(regs[tempRs1].value) + parseInt(imm);
             console.log(imm);
             break;
           }
           else if (this.state.insrtuctions[i].instruction.search("add") > -1) {
-            regs[tempRD].value = regs[tempRs1].value + regs[tempRs2].value;
+            if (tempRD != 0)
+              regs[tempRD].value = regs[tempRs1].value + regs[tempRs2].value;
             console.log(tempRD);
             break;
           }
           else if (this.state.insrtuctions[i].instruction.search("lw") > -1) {
-
-            regs[tempRD].value = this.state.data[RS[j].A].value;
+            if (tempRD != 0)
+              regs[tempRD].value = this.state.data[RS[j].A].value;
             break;
             // console.log(this.state.data[RS[j].A] + " " + regs[tempRD].value);
           }
           else if (this.state.insrtuctions[i].instruction.search("neg") > -1) {
-
-            regs[tempRD].value = - regs[tempRs1].value;
+            if (tempRD != 0)
+              regs[tempRD].value = - regs[tempRs1].value;
             break;
             // console.log(this.state.data[RS[j].A] + " " + regs[tempRD].value);
           }
           else if (this.state.insrtuctions[i].instruction.search("div") > -1) {
-
-            regs[tempRD].value = regs[tempRs1].value / regs[tempRs2].value;
+            if (tempRD != 0)
+              regs[tempRD].value = regs[tempRs1].value / regs[tempRs2].value;
             break;
             // console.log(this.state.data[RS[j].A] + " " + regs[tempRD].value);
           }
@@ -505,6 +523,8 @@ sw x1,10(x2);
                 jumb = parseInt(imm) + (i) + 1; // 0+  2 
               else
                 jumb = parseInt(imm) + (i) - 1;//-1+2-1
+
+
               beqflag = 1;
               this.setState({ missNom: this.state.missNom + 1 })
             }
@@ -514,6 +534,9 @@ sw x1,10(x2);
             }
 
             this.setState({ jumbbeq: jumb })
+            if (this.state.jalrMax < jumb)
+              this.setState({ jalrMax: jumb })
+            console.log("this.state.jalrMax" + this.state.jalrMax)
             this.setState({ branchcount: this.state.branchcount + 1 })
 
             break;
@@ -524,6 +547,7 @@ sw x1,10(x2);
             jumbjal = parseInt(regs[tempRs1].value) + (i) + 1; //not sure about the immediate   4*2
             jalflag = 1;
             this.setState({ jubmjalr: jumbjal })
+            this.setState({ lastinstructionPC: jumbjal - 1 })
             regs[1].value = (i) + 1;
 
 
@@ -1000,13 +1024,22 @@ sw x1,10(x2);
     // var clkflag;
 
 
-    if (this.state.insrtuctions[PC].Wb === "writing back" && this.state.insrtuctions[PC - 1].Wb === "writing back")
+    if (this.state.insrtuctions[this.state.lastinstructionPC].Wb === "writing back")
       this.setState({ clkflag: 1 })
+    var clkflag = 1;
+    for (var s = 0; s < variable.length; s++) {
+      if (variable[s].Issued == "Issued" && variable[s].Wb != "writing back") {
+        clkflag = 0;
+        this.setState({ clkflag: 0 })
+      }
+    }
+
 
     if (this.state.clkflag == 0) {
       this.setState({ globalclk: this.state.globalclk + 1 })
     }
     else {
+
       this.setState({ IPC: this.state.TotalInstructin / this.state.globalclk })
       if (this.state.branchcount == 0)
         this.setState({ missPer: 0 })
@@ -1059,7 +1092,6 @@ sw x1,10(x2);
 jalr x2;
 add x0,x2,x3;
 add x0,x2,x3;
- 
 add x0,x2,x3;
 add x0,x2,x3;
 add x0,x2,x3;
